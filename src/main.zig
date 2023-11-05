@@ -1,4 +1,5 @@
 const std = @import("std");
+const TcpConnection = @import("tcp_connection.zig");
 
 pub fn main() !void {
     // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
@@ -13,7 +14,27 @@ pub fn main() !void {
 
     try stdout.print("Run `zig build test` to run the tests.\n", .{});
 
+    var tcp_server: TcpConnection = try TcpConnection.init();
+    defer tcp_server.deinit();
+
+    const client_thread = try std.Thread.spawn(.{}, sendMsg, .{tcp_server.stream_server.listen_address});
+    defer client_thread.join();
+
+    try tcp_server.accept();
+
     try bw.flush(); // don't forget to flush!
+}
+
+fn sendMsg(server_address: std.net.Address) !void {
+    const conn = try std.net.tcpConnectToAddress(server_address);
+    defer conn.close();
+
+    _ = try conn.write("Hello from client");
+
+    var buf: [1024]u8 = undefined;
+    const msg_size = try conn.read(buf[0..]);
+
+    std.debug.print("Message received by client :: {s}\n", .{buf[0..msg_size]});
 }
 
 test "simple test" {
