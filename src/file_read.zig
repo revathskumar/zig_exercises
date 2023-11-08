@@ -54,3 +54,23 @@ test "read file content: using readUntilDelimiterOrEof" {
 
     try std.testing.expectEqualStrings("helloworld", str);
 }
+
+test "read file content: using readAll" {
+    var file = try std.fs.cwd().openFile("file.txt", .{});
+    defer file.close();
+
+    var buf: [12]u8 = undefined;
+    var buf_reader = std.io.bufferedReader(file.reader());
+    // _ = try buf_reader.read(&buf);
+    var in_stream = buf_reader.reader();
+
+    const size = try in_stream.read(&buf);
+
+    // const str: []const u8 = try allocator.dupe(u8, content.items);
+
+    try std.testing.expectEqualStrings(
+        \\hello
+        \\
+        \\world
+    , buf[0..size]);
+}
