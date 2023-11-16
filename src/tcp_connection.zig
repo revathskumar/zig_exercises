@@ -26,5 +26,9 @@ pub fn accept(self: *Self) !void {
     var buf: [1024]u8 = undefined;
     const msg_size = try conn.stream.read(buf[0..]);
 
+    if (msg_size == 0) {
+        return;
+    }
+
     std.debug.print("Message received by Server :: {s}\n", .{buf[0..msg_size]});
 }
