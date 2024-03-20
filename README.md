@@ -13,6 +13,13 @@ zig test src/file_read.zig
 zig run src/fstat.zig
 ```
 
+wasm
+
+```
+zig build-lib src/string_to_wasm.zig -target wasm32-freestanding -dynamic -rdynamic
+node wasm.js
+```
+
 ## License
 
 MIT
