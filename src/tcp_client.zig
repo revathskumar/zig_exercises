@@ -14,7 +14,7 @@ pub fn main() !void {
         std.debug.print("Write something: ", .{});
 
         var msg_buf: [4096]u8 = undefined;
-        var msg = try r.readUntilDelimiterOrEof(&msg_buf, '\n');
+        const msg = try r.readUntilDelimiterOrEof(&msg_buf, '\n');
 
         if (msg) |m| {
             _ = try conn.write(m);

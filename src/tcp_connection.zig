@@ -1,26 +1,26 @@
 const Self = @This();
 const std = @import("std");
+const print = std.debug.print;
 
-stream_server: std.net.StreamServer,
+server: std.net.Server,
 
 pub fn init(ip: [4]u8, port: u16) !Self {
     std.debug.print("Init\n", .{});
     const address = std.net.Address.initIp4(ip, port);
 
-    var server = std.net.StreamServer.init(.{ .reuse_address = true });
-    try server.listen(address);
+    const server = try std.net.Address.listen(address, .{ .reuse_address = true });
 
-    return Self{ .stream_server = server };
+    return Self{ .server = server };
 }
 
 pub fn deinit(self: *Self) void {
     std.debug.print("deinit\n", .{});
-    self.stream_server.deinit();
+    self.server.deinit();
 }
 
 pub fn accept(self: *Self) !void {
     std.debug.print("Accept\n", .{});
-    const conn = try self.stream_server.accept();
+    const conn = try self.server.accept();
     defer conn.stream.close();
 
     var buf: [1024]u8 = undefined;
